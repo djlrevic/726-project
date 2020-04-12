@@ -1,8 +1,10 @@
 import midi
+import numpy as np
 import pandas as pd
 import tensorflow as tf
 
 from pathlib import Path
+from midi_dataset import MidiDataset
 
 if (not tf.executing_eagerly()):
     print('You are not running w/ eager execution. Try with TensorFlow version 2.1')
@@ -10,17 +12,16 @@ if (not tf.executing_eagerly()):
 
 if __name__ == "__main__":
     pd.options.display.width = 0  # use maximum terminal size
+    np.set_printoptions(precision=4)
 
-    data_folder = Path("maestro-v2.0.0")
-    csv = pd.read_csv(data_folder/"maestro-v2.0.0.csv")
-    print(csv.describe())
-    print(csv.head(5))
+    dataset = MidiDataset()
+    tf.print(dataset.take(1))
 
-    filenames = csv['midi_filename'].head(3)
-    raw_midi = [midi.read_midifile(data_folder/f) for f in filenames]
 
-    print(raw_midi[0])
+    #for feat, targ in dataset.take(5):
+    # print(raw_midi[0])
 
+    #midi = raw_midi[0]
     # extract features
 
 
