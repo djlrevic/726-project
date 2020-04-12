@@ -1,22 +1,12 @@
-import pretty_midi
-import numpy as np
+import midi
 import pandas as pd
 import tensorflow as tf
+
+import midi_musical_matrix as mmm
 
 from pathlib import Path
 
 class MidiDataset(tf.data.Dataset):
-    @staticmethod
-    def _midiFileToData(file: Path) -> tf.Tensor:
-        m = pretty_midi.PrettyMIDI(str(file))
-        piano_roll = m.instruments[0].get_piano_roll()
-        print(piano_roll)
-        # print(f"Reading {file}:\n\t"
-        #       f"Format:{m.format}\n\t"
-        #       f"Resolution:{m.resolution}\n\t"
-        #       f"TickRelative:{m.tick_relative}\n")
-        return tf.convert_to_tensor(piano_roll)
-
     @staticmethod
     def _generator():
         data_folder = Path("maestro-v2.0.0")
@@ -25,20 +15,16 @@ class MidiDataset(tf.data.Dataset):
             usecols=['canonical_composer', 'canonical_title', 'year', 'midi_filename', 'duration']
         )
 
-        print(csv.describe())
-        print(csv.head(2))
-
-        filenames = csv['midi_filename'].head(1)
-        midi_files = [f for f in filenames]
+        midi_files = [f for f in csv['midi_filename']]
 
         for f in midi_files:
             # Reading data (line, record) from the file
-            yield MidiDataset._midiFileToData(data_folder/f)
+            yield mmm.midiToNoteStateMatrix(str(data_folder/f))
 
     def __new__(cls, num_samples=3):
         return tf.data.Dataset.from_generator(
             cls._generator,
             output_types=tf.dtypes.int64,
-            output_shapes=(128, None),  # right now just midi 1-128
+            output_shapes=(None, 78, 2),
             args=None
         )

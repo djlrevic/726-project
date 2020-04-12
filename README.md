@@ -1,6 +1,8 @@
 # 726-project
 SFU Machine Learning Frisson Group
 
+`model.py` is the file to run at the moment
+
 ###Required:
 Python 3.6
 Other dependencies installed in venv
