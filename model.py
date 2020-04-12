@@ -15,7 +15,10 @@ if __name__ == "__main__":
     np.set_printoptions(precision=4)
 
     dataset = MidiDataset()
-    tf.print(dataset.take(1))
+    for elem in dataset:
+        print("Printing:")
+        print(elem)
+        break
 
 
     #for feat, targ in dataset.take(5):
