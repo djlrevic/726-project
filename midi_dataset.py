@@ -1,6 +1,7 @@
 import midi
 import pandas as pd
 import tensorflow as tf
+import time
 
 import midi_musical_matrix as mmm
 
@@ -28,3 +29,18 @@ class MidiDataset(tf.data.Dataset):
             output_shapes=(None, 78, 2),
             args=None
         )
+
+def benchmark(dataset, num_epochs=2):
+    start_time = time.perf_counter()
+    for epoch_num in range(num_epochs):
+        print(f"Epoch: {epoch_num}")
+        count=0
+        for sample in dataset:
+            count += 1
+            print(f"Sample: {count}")
+            # Performing a training step
+            time.sleep(0.01)
+    print("Execution time:", time.perf_counter() - start_time)
+
+if __name__=="__main__":
+    benchmark(MidiDataset())

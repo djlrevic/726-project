@@ -1,23 +1,42 @@
 import numpy as np
 import pandas as pd
 import tensorflow as tf
+from tensorflow import keras
+from tensorflow.keras import layers
 
 from pathlib import Path
 from midi_dataset import MidiDataset
 
+pd.options.display.width = 0  # use maximum terminal size
+np.set_printoptions(precision=4)
 if (not tf.executing_eagerly()):
     print('You are not running w/ eager execution. Try with TensorFlow version 2.1')
 
+def get_uncompiled_model():
+    inputs = keras.Input(shape=(None, 78, 2), name='note_state_matrix')
+    x = layers.Dense(64, activation='relu', name='dense_1')(inputs)
+    x = layers.Dense(64, activation='relu', name='dense_2')(x)
+    outputs = layers.Dense(tf.shape(inputs,0), name='predictions')(x)
+    model = keras.Model(inputs=inputs, outputs=outputs)
+    return model
+
+def get_compiled_model():
+    model = get_uncompiled_model()
+    model.compile(optimizer=keras.optimizers.RMSprop(learning_rate=1e-3),
+                  loss=keras.losses.SparseCategoricalCrossentropy(from_logits=True),
+                  metrics=['sparse_categorical_accuracy'])
+    return model
 
 if __name__ == "__main__":
-    pd.options.display.width = 0  # use maximum terminal size
-    np.set_printoptions(precision=4)
-
     dataset = MidiDataset()
-    for elem in dataset:
-        print("Printing:")
-        print(elem)
-        break
+    train_dataset = dataset.shuffle(buffer_size=4).batch(2)
+
+    model = get_compiled_model()
+    model.fit(train_dataset, epochs=1)
+
+
+    # print(list(dataset.take(3).as_numpy_iterator()))
+
 
 
     #for feat, targ in dataset.take(5):
