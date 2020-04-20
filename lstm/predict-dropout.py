@@ -59,20 +59,21 @@ def create_network(network_input, n_vocab):
         return_sequences=True
     ))
     model.add(LSTM(512, return_sequences=True, recurrent_dropout=0.3,))
-    model.add(LSTM(512))
+    model.add(LSTM(1024))
+    model.add(BatchNorm())
+    model.add(Dropout(0.3))
+    model.add(Dense(512))
+    model.add(Activation('relu'))
     model.add(BatchNorm())
     model.add(Dropout(0.3))
     model.add(Dense(256))
     model.add(Activation('relu'))
     model.add(BatchNorm())
     model.add(Dropout(0.3))
-    model.add(Dense(128))
-    model.add(Activation('relu'))
-    model.add(BatchNorm())
-    model.add(Dropout(0.3))
     model.add(Dense(n_vocab))
     model.add(Activation('softmax'))
     model.compile(loss='categorical_crossentropy', optimizer='adam')
+
 
     # Load the weights to each node
     model.load_weights('weights-dropout.hdf5')
